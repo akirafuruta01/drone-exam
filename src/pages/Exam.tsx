@@ -8,7 +8,7 @@ import { ChoiceNote, TermsMemo } from "../lib/QuestionParts";
 import AnswerInput, { ANSWER_MODES, hashOf, type AnswerMode } from "../lib/AnswerInput";
 import { usePageBackground } from "../lib/background";
 import Podcast from "../lib/Podcast";
-import { useAltFor, worded } from "../lib/wording";
+import { useAltFor, variationSeed, worded } from "../lib/wording";
 import { PODCAST_EVENT } from "../lib/Podcast";
 import { randomAnim } from "../lib/anim";
 
@@ -55,7 +55,7 @@ export default function Exam({ store, setStore, onFinish }: Props) {
   const update = (patch: Partial<ExamState>) => setStore({ ...store, exam: { ...exam, ...patch } });
   const { items, answers, flags, current } = exam;
   const base = findQuestion(items[current].id)!;
-  const q = worded(base, useAltFor(base, current));
+  const q = worded(base, useAltFor(base, current), variationSeed(base, current));
   const order = items[current].order;
   const unanswered = answers.filter((a) => a === null).length;
   // すぐ解説を出す設定なら、答えた問題は答えを変えられないようにする

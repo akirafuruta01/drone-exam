@@ -24,7 +24,7 @@ export default function Practice({ title, questions, store, setStore, onExit }: 
   const items = useMemo(
     () =>
       shuffle(questions).slice(0, store.settings.sessionSize).map((q) => ({
-        q: worded(q, Math.random() < 0.5),
+        q: worded(q, Math.random() < 0.5, Math.floor(Math.random() * 2 ** 31)),
         order: choiceOrder(store.settings.shuffleChoices),
         mode: store.settings.varyAnswerMode
           ? ANSWER_MODES[Math.floor(Math.random() * ANSWER_MODES.length)]
