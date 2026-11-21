@@ -7,6 +7,7 @@ import OriginMark from "../lib/OriginMark";
 import { ChoiceNote, TermsMemo } from "../lib/QuestionParts";
 import AnswerInput, { ANSWER_MODES, type AnswerMode } from "../lib/AnswerInput";
 import { BACKGROUNDS, usePageBackground } from "../lib/background";
+import Podcast from "../lib/Podcast";
 
 interface Props {
   title: string;
@@ -128,6 +129,7 @@ export default function Practice({ title, questions, store, setStore, onExit }: 
           </div>
           <p className="leading-relaxed">{q.explanation}</p>
           <p className="text-sm text-slate-500">参照：{q.reference}</p>
+              <Podcast q={q} />
           <button
             onClick={() => {
               setPicked(null);
