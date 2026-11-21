@@ -12,6 +12,8 @@ export interface Question {
   verified: boolean;
   verifiedAt: string | null;
   sourceVersion: string | null;
+  /** 問題の作り方：kyosoku＝教則の文をほぼそのまま使った問題、original＝AIが考えたオリジナル問題 */
+  origin?: "kyosoku" | "original";
 }
 
 export const CATEGORIES: { id: CategoryId; name: string; detail: string }[] = [

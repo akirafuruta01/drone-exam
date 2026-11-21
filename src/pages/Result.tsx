@@ -2,6 +2,7 @@ import { CheckCircle2, XCircle } from "lucide-react";
 import { findQuestion, PASS_RATE } from "../lib/questions";
 import type { ExamState } from "../lib/storage";
 import { CATEGORIES, categoryName } from "../lib/types";
+import OriginMark from "../lib/OriginMark";
 
 
 export default function Result({ exam, onExit }: { exam: ExamState; onExit: () => void }) {
@@ -70,7 +71,8 @@ export default function Result({ exam, onExit }: { exam: ExamState; onExit: () =
                 <XCircle className="shrink-0 text-red-600" size={20} />
               )}
               <span className="font-semibold">
-                問{k + 1}　{q.question}
+                問{k + 1}　<OriginMark q={q} />
+                {q.question}
               </span>
             </summary>
             <div className="mt-3 space-y-2 text-sm">
