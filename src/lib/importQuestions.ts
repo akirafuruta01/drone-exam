@@ -37,6 +37,8 @@ export function parseQuestions(text: string): ImportResult {
     if (![0, 1, 2].includes(o.answerIndex as number)) e.push("answerIndex は 0・1・2 のどれかにしてください");
     if (!isStr(o.explanation)) e.push("explanation（解説）がありません");
     if (o.reference != null && typeof o.reference !== "string") e.push("reference は文字列にしてください");
+    if (o.origin != null && o.origin !== "kyosoku" && o.origin !== "original")
+      e.push("origin は kyosoku か original にしてください（省略可）");
     if (o.verified != null && typeof o.verified !== "boolean") e.push("verified は true か false にしてください");
     if (!nullableStr(o.verifiedAt) || !nullableStr(o.sourceVersion))
       e.push("verifiedAt・sourceVersion は文字列か null にしてください");
@@ -57,6 +59,7 @@ export function parseQuestions(text: string): ImportResult {
       verified: (o.verified as boolean) ?? false,
       verifiedAt: (o.verifiedAt as string) ?? null,
       sourceVersion: (o.sourceVersion as string) ?? null,
+      ...(o.origin ? { origin: o.origin as Question["origin"] } : {}),
     });
   });
   return { questions, errors };

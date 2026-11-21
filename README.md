@@ -14,6 +14,7 @@ npm run dev
 `src/data/questions.json` に入っています。
 
 - `category`: `rules`（規則）/ `system`（システム）/ `operation`（操縦者・運航体制）/ `risk`（リスク管理）
+- `origin`: `kyosoku`（教則の文をほぼそのまま使った問題）/ `original`（AIが考えたオリジナル問題）。問題文の前に印が出る（省略可）
 - `verified`: 最新版の教則と照らし合わせて確認したか。確認前は `false`
 - `verifiedAt` / `sourceVersion`: 確認した日と、照らし合わせた教則の版
 - 選択肢は順番が入れ替わるので、「上記すべて」のような選択肢は使わない

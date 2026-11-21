@@ -3,6 +3,7 @@ import { CheckCircle2, Star, XCircle } from "lucide-react";
 import { choiceOrder, shuffle } from "../lib/questions";
 import { recordAnswer, toggleBookmark, type Store } from "../lib/storage";
 import { categoryName, type Question } from "../lib/types";
+import OriginMark from "../lib/OriginMark";
 
 interface Props {
   title: string;
@@ -77,7 +78,10 @@ export default function Practice({ title, questions, store, setStore, onExit }: 
             </button>
           </div>
         </div>
-        <p className="font-semibold leading-relaxed">{q.question}</p>
+        <p className="font-semibold leading-relaxed">
+          <OriginMark q={q} />
+          {q.question}
+        </p>
       </div>
 
       <div className="space-y-2">

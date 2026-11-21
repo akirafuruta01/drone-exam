@@ -3,6 +3,7 @@ import { Clock, Flag } from "lucide-react";
 import { findQuestion } from "../lib/questions";
 import type { ExamState, Store } from "../lib/storage";
 import { categoryName } from "../lib/types";
+import OriginMark from "../lib/OriginMark";
 
 interface Props {
   store: Store;
@@ -65,7 +66,10 @@ export default function Exam({ store, setStore, onFinish }: Props) {
                 <span className="rounded bg-amber-100 px-2 py-0.5 text-amber-800">教則と未照合</span>
               )}
             </div>
-            <p className="font-semibold leading-relaxed">{q.question}</p>
+            <p className="font-semibold leading-relaxed">
+              <OriginMark q={q} />
+              {q.question}
+            </p>
           </div>
 
           <div className="space-y-2">
