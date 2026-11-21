@@ -3,6 +3,7 @@ import { getQuestions, findQuestion, choiceOrder, setCustomQuestions, EXAM_TYPES
 import { load, recordAnswer, save, type ExamState, type Store } from "./lib/storage";
 import type { Question } from "./lib/types";
 import DataManager from "./pages/DataManager";
+import StudyTimer from "./lib/StudyTimer";
 import Exam from "./pages/Exam";
 import Home from "./pages/Home";
 import Practice from "./pages/Practice";
@@ -58,6 +59,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-slate-800">
+      <StudyTimer active={view.name === "practice" || view.name === "exam" || view.name === "result"} />
       <header className="bg-blue-950 text-white">
         <div className="mx-auto max-w-4xl px-4 py-3">
           <button

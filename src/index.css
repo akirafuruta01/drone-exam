@@ -1,1 +1,38 @@
 @import "tailwindcss";
+
+/* 学習時間のドローン：上から降りてきて、ふわふわ浮かび、5秒後に上へ戻る */
+.drone-timer {
+  animation:
+    drone-in-out 5s ease-in-out forwards,
+    drone-bob 1.6s ease-in-out infinite;
+}
+.drone-rotor {
+  transform-origin: 75px 22px;
+  animation: drone-spin 0.12s linear infinite;
+}
+.drone-watch {
+  transform-origin: 75px 48px;
+  animation: drone-swing 2s ease-in-out infinite;
+}
+@keyframes drone-in-out {
+  0% { translate: 0 -220px; opacity: 0; }
+  15% { translate: 0 0; opacity: 1; }
+  85% { translate: 0 0; opacity: 1; }
+  100% { translate: 0 -220px; opacity: 0; }
+}
+@keyframes drone-bob {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: 6px; }
+}
+@keyframes drone-spin {
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(0.6); }
+}
+@keyframes drone-swing {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .drone-timer { animation: none; }
+  .drone-rotor, .drone-watch { animation: none; }
+}
