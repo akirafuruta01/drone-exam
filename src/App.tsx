@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
-import { load, save, type Store } from "./lib/storage";
+import { allQuestions, choiceOrder, EXAM_TYPES, pickExam, type ExamType } from "./lib/questions";
+import { load, recordAnswer, save, type ExamState, type Store } from "./lib/storage";
 import type { Question } from "./lib/types";
+import Exam from "./pages/Exam";
 import Home from "./pages/Home";
 import Practice from "./pages/Practice";
+import Result from "./pages/Result";
 
-export type View = { name: "home" } | { name: "practice"; title: string; questions: Question[] };
+export type View =
+  | { name: "home" }
+  | { name: "practice"; title: string; questions: Question[] }
+  | { name: "exam" }
+  | { name: "result"; exam: ExamState };
+
+const byId = new Map(allQuestions.map((q) => [q.id, q]));
 
 export default function App() {
   const [store, setStore] = useState<Store>(load);
@@ -15,19 +24,61 @@ export default function App() {
   }, [store]);
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [view]);
+  }, [view.name]);
+
+  const startExam = (type: ExamType) => {
+    const { size, seconds } = EXAM_TYPES[type];
+    const pool = store.settings.verifiedOnly ? allQuestions.filter((q) => q.verified) : allQuestions;
+    const qs = pickExam(pool, size);
+    const exam: ExamState = {
+      items: qs.map((q) => ({ id: q.id, order: choiceOrder(store.settings.shuffleChoices) })),
+      answers: qs.map(() => null),
+      flags: qs.map(() => false),
+      current: 0,
+      endsAt: Date.now() + seconds * 1000,
+    };
+    setStore({ ...store, exam });
+    setView({ name: "exam" });
+  };
+
+  const finishExam = (exam: ExamState) => {
+    setStore((s) => {
+      let next = s;
+      exam.items.forEach((it, k) => {
+        next = recordAnswer(next, it.id, exam.answers[k] === byId.get(it.id)!.answerIndex);
+      });
+      const score = exam.items.filter((it, k) => exam.answers[k] === byId.get(it.id)!.answerIndex).length;
+      const result = { date: new Date().toISOString(), score, total: exam.items.length };
+      return { ...next, exam: null, exams: [result, ...next.exams].slice(0, 20) };
+    });
+    setView({ name: "result", exam });
+  };
 
   return (
     <div className="min-h-screen text-slate-800">
       <header className="bg-blue-950 text-white">
-        <div className="mx-auto max-w-3xl px-4 py-3">
-          <button className="font-bold" onClick={() => setView({ name: "home" })}>
+        <div className="mx-auto max-w-4xl px-4 py-3">
+          <button
+            className="font-bold"
+            onClick={() => {
+              if (view.name === "exam" && !window.confirm("試験を中断してトップへ戻りますか？（続きから再開できます）")) return;
+              setView({ name: "home" });
+            }}
+          >
             ドローン二等 学科対策
           </button>
         </div>
       </header>
-      <main className="mx-auto max-w-3xl px-4 py-6">
-        {view.name === "home" && <Home store={store} setStore={setStore} go={setView} />}
+      <main className="mx-auto max-w-4xl px-4 py-6">
+        {view.name === "home" && (
+          <Home
+            store={store}
+            setStore={setStore}
+            go={setView}
+            startExam={startExam}
+            resumeExam={() => setView({ name: "exam" })}
+          />
+        )}
         {view.name === "practice" && (
           <Practice
             key={view.title}
@@ -38,6 +89,10 @@ export default function App() {
             onExit={() => setView({ name: "home" })}
           />
         )}
+        {view.name === "exam" && store.exam && (
+          <Exam store={store} setStore={setStore} onFinish={finishExam} />
+        )}
+        {view.name === "result" && <Result exam={view.exam} onExit={() => setView({ name: "home" })} />}
       </main>
     </div>
   );
