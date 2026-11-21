@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getQuestions, findQuestion, choiceOrder, setCustomQuestions, EXAM_TYPES, pickExam, type ExamType } from "./lib/questions";
+import { getQuestions, findQuestion, choiceOrder, setCustomQuestions, examSpec, pickExam, type ExamType } from "./lib/questions";
 import { load, recordAnswer, save, type ExamState, type Store } from "./lib/storage";
 import type { Question } from "./lib/types";
 import DataManager from "./pages/DataManager";
@@ -30,7 +30,7 @@ export default function App() {
   }, [view.name]);
 
   const startExam = (type: ExamType) => {
-    const { size, seconds } = EXAM_TYPES[type];
+    const { size, seconds } = examSpec(type, store.settings.sessionSize);
     const pool = store.settings.verifiedOnly ? getQuestions().filter((q) => q.verified) : getQuestions();
     const qs = pickExam(pool, size);
     const exam: ExamState = {

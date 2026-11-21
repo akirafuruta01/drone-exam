@@ -35,11 +35,18 @@ export const EXAM_SIZE = 50;
 export const EXAM_SECONDS = 30 * 60;
 
 /** 模擬試験の種類：短い版（おすすめ）と本番と同じ版 */
-export const EXAM_TYPES = {
-  short: { size: 15, seconds: 10 * 60, title: "ミニ模擬試験（15問・10分）" },
-  full: { size: EXAM_SIZE, seconds: EXAM_SECONDS, title: "本番模擬試験（50問・30分）" },
-} as const;
-export type ExamType = keyof typeof EXAM_TYPES;
+export type ExamType = "short" | "full";
+/** 1回に解く問題数（ミニ模擬試験と分野別演習で選べる） */
+export const SESSION_SIZES = [5, 10, 15] as const;
+export type SessionSize = (typeof SESSION_SIZES)[number];
+
+/** 模擬試験の種類ごとの問題数・時間。ミニは選んだ問題数に合わせて、1問40秒で時間を決める */
+export function examSpec(type: ExamType, shortSize: SessionSize) {
+  if (type === "full") return { size: EXAM_SIZE, seconds: EXAM_SECONDS, title: "本番模擬試験（50問・30分）" };
+  const seconds = shortSize * 40;
+  const m = Math.floor(seconds / 60), sec = seconds % 60;
+  return { size: shortSize, seconds, title: `ミニ模擬試験（${shortSize}問・${m}分${sec ? `${sec}秒` : ""}）` };
+}
 export const PASS_RATE = 0.8;
 
 /** 模擬試験の問題を選ぶ。分野ごとの問題数の割合をできるだけ保つ */
