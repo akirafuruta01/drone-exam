@@ -1,6 +1,6 @@
 import { BookOpen, Clock, Database, Target, TriangleAlert } from "lucide-react";
 import type { View } from "../App";
-import { getQuestions, EXAM_TYPES, PASS_RATE, type ExamType } from "../lib/questions";
+import { getQuestions, examSpec, PASS_RATE, SESSION_SIZES } from "../lib/questions";
 import { isWeak, type Store } from "../lib/storage";
 import { CATEGORIES } from "../lib/types";
 
@@ -8,7 +8,7 @@ interface Props {
   store: Store;
   setStore: (s: Store) => void;
   go: (v: View) => void;
-  startExam: (type: ExamType) => void;
+  startExam: (type: "short" | "full") => void;
   resumeExam: () => void;
 }
 
@@ -16,9 +16,8 @@ export default function Home({ store, setStore, go, startExam, resumeExam }: Pro
   const { records, bookmarks, settings, exams, exam } = store;
   const pool = settings.verifiedOnly ? getQuestions().filter((q) => q.verified) : getQuestions();
   const answered = getQuestions().filter((q) => records[q.id]).length;
-  const attempts = Object.values(records).reduce((a, r) => a + r.attempts, 0);
-  const correct = Object.values(records).reduce((a, r) => a + r.correct, 0);
-  const rate = attempts ? Math.round((correct / attempts) * 100) : 0;
+  const recent = store.recent;
+  const recentRate = recent.length ? Math.round((recent.filter(Boolean).length / recent.length) * 100) : null;
   const weak = pool.filter((q) => isWeak(records[q.id]) || bookmarks.includes(q.id));
   const unverified = getQuestions().filter((q) => !q.verified).length;
 
@@ -29,9 +28,29 @@ export default function Home({ store, setStore, go, startExam, resumeExam }: Pro
     <div className="space-y-6">
       <section className="grid grid-cols-3 gap-3">
         <Stat label="解答済み" value={`${answered} / ${getQuestions().length}`} />
-        <Stat label="正答率" value={`${rate}%`} />
+        <Stat
+          label={`直近${recent.length || ""}回の正答率`}
+          value={recentRate === null ? "—" : `${recentRate}%`}
+        />
         <Stat label="苦手問題" value={`${getQuestions().filter((q) => isWeak(records[q.id])).length}問`} />
       </section>
+
+      <section className="flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white p-3 text-sm">
+        <span className="font-bold text-blue-950">1回の問題数</span>
+        <div className="flex gap-1" role="group" aria-label="1回の問題数">
+          {SESSION_SIZES.map((n) => (
+            <button
+              key={n}
+              onClick={() => setStore({ ...store, settings: { ...settings, sessionSize: n } })}
+              aria-pressed={settings.sessionSize === n}
+              className={`rounded-md px-4 py-1.5 font-bold ${settings.sessionSize === n ? "bg-blue-900 text-white" : "bg-slate-100 text-blue-900"}`}
+            >
+              {n}問
+            </button>
+          ))}
+        </div>
+      </section>
+      <p className="-mt-4 text-xs text-slate-500">ミニ模擬試験と分野別演習・弱点克服に使います（本番模擬試験は50問）</p>
 
       <section className="space-y-3">
         {exam && (
@@ -43,7 +62,7 @@ export default function Home({ store, setStore, go, startExam, resumeExam }: Pro
           />
         )}
         {(["short", "full"] as const).map((type) => {
-          const t = EXAM_TYPES[type];
+          const t = examSpec(type, settings.sessionSize);
           return (
             <ModeButton
               key={type}
@@ -66,7 +85,7 @@ export default function Home({ store, setStore, go, startExam, resumeExam }: Pro
         <ModeButton
           icon={<Target size={22} />}
           title="弱点克服"
-          note={weak.length ? `間違えた問題・★の問題 ${weak.length}問` : "まだ対象の問題はありません"}
+          note={weak.length ? `間違えた問題・★の問題 ${weak.length}問から${Math.min(settings.sessionSize, weak.length)}問` : "まだ対象の問題はありません"}
           disabled={!weak.length}
           onClick={() => go({ name: "practice", title: "弱点克服", questions: weak })}
         />
@@ -111,7 +130,7 @@ export default function Home({ store, setStore, go, startExam, resumeExam }: Pro
               >
                 <div className="font-semibold text-blue-950">{c.name}</div>
                 <div className="text-sm text-slate-500">
-                  {c.detail}・{qs.length}問
+                  {c.detail}・全{qs.length}問から{Math.min(settings.sessionSize, qs.length)}問
                 </div>
               </button>
             );

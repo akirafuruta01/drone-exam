@@ -23,7 +23,7 @@ export default function Practice({ title, questions, store, setStore, onExit }: 
   // 開始時に出題順と選択肢の順番を決める
   const items = useMemo(
     () =>
-      shuffle(questions).map((q) => ({
+      shuffle(questions).slice(0, store.settings.sessionSize).map((q) => ({
         q: worded(q, Math.random() < 0.5),
         order: choiceOrder(store.settings.shuffleChoices),
         mode: store.settings.varyAnswerMode

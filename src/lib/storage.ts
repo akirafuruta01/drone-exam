@@ -1,6 +1,8 @@
 import type { Question } from "./types";
 
 const KEY = "drone-exam:v1";
+/** 直近の正答率に使う回答数 */
+export const RECENT_MAX = 50;
 
 export interface QuestionRecord {
   attempts: number;
@@ -17,6 +19,8 @@ export interface Settings {
   examInstantFeedback: boolean;
   /** 答え方（タップ・チェック・ドラッグ・長押し）を問題ごとに変える */
   varyAnswerMode: boolean;
+  /** 1回に解く問題数（ミニ模擬試験と分野別演習） */
+  sessionSize: 5 | 10 | 15;
 }
 
 export interface ExamResult {
@@ -45,15 +49,18 @@ export interface Store {
   exam: ExamState | null;
   /** 読み込んだオリジナル問題 */
   customQuestions: Question[];
+  /** 直近の回答の正誤（新しいものが後ろ、最大 RECENT_MAX 件） */
+  recent: boolean[];
 }
 
 const empty = (): Store => ({
   records: {},
   bookmarks: [],
-  settings: { shuffleChoices: true, verifiedOnly: false, examInstantFeedback: true, varyAnswerMode: true },
+  settings: { shuffleChoices: true, verifiedOnly: false, examInstantFeedback: true, varyAnswerMode: true, sessionSize: 10 },
   exams: [],
   exam: null,
   customQuestions: [],
+  recent: [],
 });
 
 export function load(): Store {
@@ -69,6 +76,7 @@ export function load(): Store {
       exams: s.exams ?? e.exams,
       exam: s.exam ?? e.exam,
       customQuestions: s.customQuestions ?? e.customQuestions,
+      recent: s.recent ?? e.recent,
     };
   } catch {
     return empty();
@@ -87,6 +95,7 @@ export function recordAnswer(s: Store, id: string, ok: boolean): Store {
   const r = s.records[id] ?? { attempts: 0, correct: 0, lastCorrect: false, streak: 0 };
   return {
     ...s,
+    recent: [...s.recent, ok].slice(-RECENT_MAX),
     records: {
       ...s.records,
       [id]: {
