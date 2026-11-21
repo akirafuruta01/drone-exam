@@ -7,6 +7,7 @@ import OriginMark from "../lib/OriginMark";
 import { ChoiceNote, TermsMemo } from "../lib/QuestionParts";
 import AnswerInput, { ANSWER_MODES, hashOf, type AnswerMode } from "../lib/AnswerInput";
 import { usePageBackground } from "../lib/background";
+import Podcast from "../lib/Podcast";
 
 interface Props {
   store: Store;
@@ -125,6 +126,7 @@ export default function Exam({ store, setStore, onFinish }: Props) {
               </div>
               <p className="text-sm leading-relaxed">{q.explanation}</p>
               <p className="text-xs text-slate-500">参照：{q.reference}</p>
+              <Podcast q={q} />
             </div>
           )}
 

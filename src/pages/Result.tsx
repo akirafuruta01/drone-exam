@@ -4,6 +4,7 @@ import type { ExamState } from "../lib/storage";
 import { CATEGORIES, categoryName } from "../lib/types";
 import OriginMark from "../lib/OriginMark";
 import { ChoiceNote, TermsMemo } from "../lib/QuestionParts";
+import Podcast from "../lib/Podcast";
 
 
 export default function Result({ exam, onExit }: { exam: ExamState; onExit: () => void }) {
@@ -93,6 +94,7 @@ export default function Result({ exam, onExit }: { exam: ExamState; onExit: () =
               {picked === null && <div className="text-red-700">未解答</div>}
               <p className="leading-relaxed">{q.explanation}</p>
               <p className="text-slate-500">参照：{q.reference}</p>
+              <Podcast q={q} />
             </div>
           </details>
         ))}

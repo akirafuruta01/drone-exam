@@ -25,3 +25,10 @@ main に取り込まれると、GitHub Actions が自動でビルドして GitHu
 
 - 公開先：https://akirafuruta01.github.io/drone-exam/
 - 初回だけ、リポジトリの Settings → Pages → Source を「GitHub Actions」にしておく
+
+## ポッドキャスト（難しい問題だけ）
+
+- 台本：`podcast/scripts/<問題id>.json`（`expert`＝詳しい人、`beginner`＝初心者）
+- 音声：`public/podcast/<問題id>.mp3`。`podcast/make_episode.py` で VOICEVOX から作る
+- 一覧：`src/data/podcasts.json`（ここにある問題だけ、解説の下にプレーヤーが出る）
+- 音声：VOICEVOX:青山龍星（詳しい人）／VOICEVOX:玄野武宏（初心者）。クレジット表示が利用条件
