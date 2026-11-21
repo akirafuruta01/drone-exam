@@ -18,6 +18,8 @@ export interface Question {
   choiceNotes?: string[];
   /** 問題文の下に出す用語メモ */
   terms?: { term: string; meaning: string }[];
+  /** 言い換え版（語順や表現を変えた問題文と選択肢。選択肢の並びと意味は元と同じ） */
+  alt?: { question: string; choices: [string, string, string] };
 }
 
 export const CATEGORIES: { id: CategoryId; name: string; detail: string }[] = [

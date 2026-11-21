@@ -5,11 +5,13 @@ import { CATEGORIES, categoryName } from "../lib/types";
 import OriginMark from "../lib/OriginMark";
 import { ChoiceNote, TermsMemo } from "../lib/QuestionParts";
 import Podcast from "../lib/Podcast";
+import { useAltFor, worded } from "../lib/wording";
 
 
 export default function Result({ exam, onExit }: { exam: ExamState; onExit: () => void }) {
   const rows = exam.items.map((it, k) => {
-    const q = findQuestion(it.id)!;
+    const base = findQuestion(it.id)!;
+    const q = worded(base, useAltFor(base, k));
     return { q, order: it.order, picked: exam.answers[k], ok: exam.answers[k] === q.answerIndex };
   });
   const score = rows.filter((r) => r.ok).length;
