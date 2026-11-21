@@ -4,6 +4,7 @@ import { findQuestion } from "../lib/questions";
 import type { ExamState, Store } from "../lib/storage";
 import { categoryName } from "../lib/types";
 import OriginMark from "../lib/OriginMark";
+import { ChoiceNote, TermsMemo } from "../lib/QuestionParts";
 
 interface Props {
   store: Store;
@@ -74,6 +75,7 @@ export default function Exam({ store, setStore, onFinish }: Props) {
               <OriginMark q={q} />
               {q.question}
             </p>
+            <TermsMemo q={q} />
           </div>
 
           <div className="space-y-2">
@@ -96,7 +98,10 @@ export default function Exam({ store, setStore, onFinish }: Props) {
                     className="mt-1"
                   />
                   <span className="font-bold text-blue-900">{n + 1}</span>
-                  <span>{q.choices[orig]}</span>
+                  <span>
+                    {q.choices[orig]}
+                    {shown && <ChoiceNote q={q} orig={orig} />}
+                  </span>
                 </label>
               );
             })}
