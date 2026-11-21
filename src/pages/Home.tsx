@@ -153,6 +153,14 @@ export default function Home({ store, setStore, go, startExam, resumeExam }: Pro
           />
           模擬試験でも、答えたらすぐ正解と解説を出す
         </label>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={settings.varyAnswerMode}
+            onChange={(e) => setSetting("varyAnswerMode", e.target.checked)}
+          />
+          答え方（タップ・チェック・ドラッグ・長押し）を問題ごとに変える
+        </label>
         {unverified > 0 && (
           <p className="text-amber-700">
             <TriangleAlert size={14} className="inline" /> 教則と未照合の問題が {unverified} 問あります。

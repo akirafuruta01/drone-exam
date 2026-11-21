@@ -5,6 +5,8 @@ import type { ExamState, Store } from "../lib/storage";
 import { categoryName } from "../lib/types";
 import OriginMark from "../lib/OriginMark";
 import { ChoiceNote, TermsMemo } from "../lib/QuestionParts";
+import AnswerInput, { ANSWER_MODES, hashOf, type AnswerMode } from "../lib/AnswerInput";
+import { usePageBackground } from "../lib/background";
 
 interface Props {
   store: Store;
@@ -38,6 +40,11 @@ export default function Exam({ store, setStore, onFinish }: Props) {
   const instant = store.settings.examInstantFeedback;
   const shown = instant && answers[current] !== null;
   const ok = answers[current] === q.answerIndex;
+  // 背景と答え方は、問題ごとに決まる（開き直しても同じ）
+  const seed = hashOf(`${q.id}-${current}`);
+  usePageBackground(seed);
+  const mode: AnswerMode = store.settings.varyAnswerMode ? ANSWER_MODES[seed % ANSWER_MODES.length] : "tap";
+  const choose = (orig: number) => update({ answers: answers.map((a, k) => (k === current ? orig : a)) });
 
   const finish = () => {
     const msg = unanswered
@@ -51,7 +58,7 @@ export default function Exam({ store, setStore, onFinish }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="sticky top-0 z-10 -mx-4 flex items-center justify-between bg-slate-50/95 px-4 py-2">
+      <div className="sticky top-0 z-10 -mx-4 flex items-center justify-between bg-white/80 px-4 py-2 backdrop-blur">
         <span className={`flex items-center gap-1 text-lg font-bold ${left < 300 ? "text-red-600" : "text-blue-950"}`}>
           <Clock size={20} /> 残り {mm}:{ss}
         </span>
@@ -78,7 +85,11 @@ export default function Exam({ store, setStore, onFinish }: Props) {
             <TermsMemo q={q} />
           </div>
 
-          <div className="space-y-2">
+          {instant && !shown && (
+            <AnswerInput key={current} q={q} order={order} mode={mode} onAnswer={choose} />
+          )}
+
+          <div className={instant && !shown ? "hidden" : "space-y-2"}>
             {order.map((orig, n) => {
               const sel = answers[current] === orig;
               let style = sel ? "border-blue-600 bg-blue-50" : "border-slate-200 bg-white";
@@ -94,7 +105,7 @@ export default function Exam({ store, setStore, onFinish }: Props) {
                     name={`q${current}`}
                     checked={sel}
                     disabled={shown}
-                    onChange={() => update({ answers: answers.map((a, k) => (k === current ? orig : a)) })}
+                    onChange={() => choose(orig)}
                     className="mt-1"
                   />
                   <span className="font-bold text-blue-900">{n + 1}</span>
