@@ -1,0 +1,25 @@
+export type CategoryId = "rules" | "system" | "operation" | "risk";
+
+export interface Question {
+  id: string;
+  category: CategoryId;
+  question: string;
+  choices: [string, string, string];
+  answerIndex: number;
+  explanation: string;
+  reference: string;
+  /** 最新版の教則と照らし合わせて確認済みか */
+  verified: boolean;
+  verifiedAt: string | null;
+  sourceVersion: string | null;
+}
+
+export const CATEGORIES: { id: CategoryId; name: string; detail: string }[] = [
+  { id: "rules", name: "無人航空機に関する規則", detail: "航空法・小型無人機等飛行禁止法など" },
+  { id: "system", name: "無人航空機のシステム", detail: "機体構造・バッテリー・電波・センサー" },
+  { id: "operation", name: "無人航空機の操縦者及び運航体制", detail: "ヒューマンファクター・CRM・点検" },
+  { id: "risk", name: "運航上のリスク管理", detail: "気象・飛行計画・緊急時対応" },
+];
+
+export const categoryName = (id: CategoryId) =>
+  CATEGORIES.find((c) => c.id === id)?.name ?? id;
