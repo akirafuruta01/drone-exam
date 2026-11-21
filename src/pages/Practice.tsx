@@ -5,6 +5,8 @@ import { recordAnswer, toggleBookmark, type Store } from "../lib/storage";
 import { categoryName, type Question } from "../lib/types";
 import OriginMark from "../lib/OriginMark";
 import { ChoiceNote, TermsMemo } from "../lib/QuestionParts";
+import AnswerInput, { ANSWER_MODES, type AnswerMode } from "../lib/AnswerInput";
+import { BACKGROUNDS, usePageBackground } from "../lib/background";
 
 interface Props {
   title: string;
@@ -17,13 +19,22 @@ interface Props {
 export default function Practice({ title, questions, store, setStore, onExit }: Props) {
   // 開始時に出題順と選択肢の順番を決める
   const items = useMemo(
-    () => shuffle(questions).map((q) => ({ q, order: choiceOrder(store.settings.shuffleChoices) })),
+    () =>
+      shuffle(questions).map((q) => ({
+        q,
+        order: choiceOrder(store.settings.shuffleChoices),
+        mode: store.settings.varyAnswerMode
+          ? ANSWER_MODES[Math.floor(Math.random() * ANSWER_MODES.length)]
+          : ("tap" as AnswerMode),
+        bg: Math.floor(Math.random() * BACKGROUNDS.length),
+      })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [score, setScore] = useState(0);
+  usePageBackground(i < items.length ? items[i].bg : null);
 
   if (i >= items.length) {
     return (
@@ -39,7 +50,7 @@ export default function Practice({ title, questions, store, setStore, onExit }: 
     );
   }
 
-  const { q, order } = items[i];
+  const { q, order, mode } = items[i];
   const answered = picked !== null;
   const ok = picked === q.answerIndex;
   const marked = store.bookmarks.includes(q.id);
@@ -86,7 +97,9 @@ export default function Practice({ title, questions, store, setStore, onExit }: 
         <TermsMemo q={q} />
       </div>
 
-      <div className="space-y-2">
+      {!answered && <AnswerInput key={i} q={q} order={order} mode={mode} onAnswer={choose} />}
+
+      <div className={answered ? "space-y-2" : "hidden"}>
         {order.map((orig, n) => {
           let style = "border-slate-200 bg-white hover:border-blue-400";
           if (answered && orig === q.answerIndex) style = "border-green-500 bg-green-50";

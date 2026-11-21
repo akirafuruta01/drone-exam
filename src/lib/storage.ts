@@ -15,6 +15,8 @@ export interface Settings {
   verifiedOnly: boolean;
   /** 模擬試験でも1問ごとに正解と解説を表示する */
   examInstantFeedback: boolean;
+  /** 答え方（タップ・チェック・ドラッグ・長押し）を問題ごとに変える */
+  varyAnswerMode: boolean;
 }
 
 export interface ExamResult {
@@ -46,7 +48,7 @@ export interface Store {
 const empty = (): Store => ({
   records: {},
   bookmarks: [],
-  settings: { shuffleChoices: true, verifiedOnly: false, examInstantFeedback: true },
+  settings: { shuffleChoices: true, verifiedOnly: false, examInstantFeedback: true, varyAnswerMode: true },
   exams: [],
   exam: null,
   customQuestions: [],
