@@ -13,6 +13,8 @@ export interface QuestionRecord {
 export interface Settings {
   shuffleChoices: boolean;
   verifiedOnly: boolean;
+  /** 模擬試験でも1問ごとに正解と解説を表示する */
+  examInstantFeedback: boolean;
 }
 
 export interface ExamResult {
@@ -44,7 +46,7 @@ export interface Store {
 const empty = (): Store => ({
   records: {},
   bookmarks: [],
-  settings: { shuffleChoices: true, verifiedOnly: false },
+  settings: { shuffleChoices: true, verifiedOnly: false, examInstantFeedback: true },
   exams: [],
   exam: null,
   customQuestions: [],

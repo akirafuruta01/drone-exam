@@ -145,6 +145,14 @@ export default function Home({ store, setStore, go, startExam, resumeExam }: Pro
           />
           教則と照合済みの問題だけ出す
         </label>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={settings.examInstantFeedback}
+            onChange={(e) => setSetting("examInstantFeedback", e.target.checked)}
+          />
+          模擬試験でも、答えたらすぐ正解と解説を出す
+        </label>
         {unverified > 0 && (
           <p className="text-amber-700">
             <TriangleAlert size={14} className="inline" /> 教則と未照合の問題が {unverified} 問あります。
