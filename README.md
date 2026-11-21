@@ -17,3 +17,10 @@ npm run dev
 - `verified`: 最新版の教則と照らし合わせて確認したか。確認前は `false`
 - `verifiedAt` / `sourceVersion`: 確認した日と、照らし合わせた教則の版
 - 選択肢は順番が入れ替わるので、「上記すべて」のような選択肢は使わない
+
+## 公開
+
+main に取り込まれると、GitHub Actions が自動でビルドして GitHub Pages に公開します。
+
+- 公開先：https://akirafuruta01.github.io/drone-exam/
+- 初回だけ、リポジトリの Settings → Pages → Source を「GitHub Actions」にしておく
