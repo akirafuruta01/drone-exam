@@ -13,16 +13,36 @@ export interface Settings {
   verifiedOnly: boolean;
 }
 
+export interface ExamResult {
+  date: string;
+  score: number;
+  total: number;
+}
+
+/** 途中の模擬試験（画面を閉じても続きから再開するため保存する） */
+export interface ExamState {
+  items: { id: string; order: number[] }[];
+  /** 選んだ選択肢（元の番号）。未解答は null */
+  answers: (number | null)[];
+  flags: boolean[];
+  current: number;
+  endsAt: number;
+}
+
 export interface Store {
   records: Record<string, QuestionRecord>;
   bookmarks: string[];
   settings: Settings;
+  exams: ExamResult[];
+  exam: ExamState | null;
 }
 
 const empty = (): Store => ({
   records: {},
   bookmarks: [],
   settings: { shuffleChoices: true, verifiedOnly: false },
+  exams: [],
+  exam: null,
 });
 
 export function load(): Store {
@@ -35,6 +55,8 @@ export function load(): Store {
       records: s.records ?? e.records,
       bookmarks: s.bookmarks ?? e.bookmarks,
       settings: { ...e.settings, ...s.settings },
+      exams: s.exams ?? e.exams,
+      exam: s.exam ?? e.exam,
     };
   } catch {
     return empty();
