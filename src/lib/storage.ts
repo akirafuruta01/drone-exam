@@ -1,3 +1,5 @@
+import type { Question } from "./types";
+
 const KEY = "drone-exam:v1";
 
 export interface QuestionRecord {
@@ -35,6 +37,8 @@ export interface Store {
   settings: Settings;
   exams: ExamResult[];
   exam: ExamState | null;
+  /** 読み込んだオリジナル問題 */
+  customQuestions: Question[];
 }
 
 const empty = (): Store => ({
@@ -43,6 +47,7 @@ const empty = (): Store => ({
   settings: { shuffleChoices: true, verifiedOnly: false },
   exams: [],
   exam: null,
+  customQuestions: [],
 });
 
 export function load(): Store {
@@ -57,6 +62,7 @@ export function load(): Store {
       settings: { ...e.settings, ...s.settings },
       exams: s.exams ?? e.exams,
       exam: s.exam ?? e.exam,
+      customQuestions: s.customQuestions ?? e.customQuestions,
     };
   } catch {
     return empty();

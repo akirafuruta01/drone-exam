@@ -1,7 +1,20 @@
 import data from "../data/questions.json";
 import type { Question } from "./types";
 
-export const allQuestions = data as Question[];
+/** アプリに最初から入っている問題 */
+export const builtinQuestions = data as Question[];
+
+let all: Question[] = builtinQuestions;
+let byId = new Map(all.map((q) => [q.id, q]));
+
+/** 読み込んだ問題（localStorage に保存）を、最初から入っている問題に加える */
+export function setCustomQuestions(custom: Question[]) {
+  all = [...builtinQuestions, ...custom];
+  byId = new Map(all.map((q) => [q.id, q]));
+}
+
+export const getQuestions = () => all;
+export const findQuestion = (id: string) => byId.get(id);
 
 /** 配列をシャッフルした新しい配列を返す */
 export function shuffle<T>(arr: T[]): T[] {

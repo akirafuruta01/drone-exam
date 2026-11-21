@@ -1,6 +1,6 @@
-import { BookOpen, Clock, Target, TriangleAlert } from "lucide-react";
+import { BookOpen, Clock, Database, Target, TriangleAlert } from "lucide-react";
 import type { View } from "../App";
-import { allQuestions, EXAM_TYPES, PASS_RATE, type ExamType } from "../lib/questions";
+import { getQuestions, EXAM_TYPES, PASS_RATE, type ExamType } from "../lib/questions";
 import { isWeak, type Store } from "../lib/storage";
 import { CATEGORIES } from "../lib/types";
 
@@ -14,13 +14,13 @@ interface Props {
 
 export default function Home({ store, setStore, go, startExam, resumeExam }: Props) {
   const { records, bookmarks, settings, exams, exam } = store;
-  const pool = settings.verifiedOnly ? allQuestions.filter((q) => q.verified) : allQuestions;
-  const answered = allQuestions.filter((q) => records[q.id]).length;
+  const pool = settings.verifiedOnly ? getQuestions().filter((q) => q.verified) : getQuestions();
+  const answered = getQuestions().filter((q) => records[q.id]).length;
   const attempts = Object.values(records).reduce((a, r) => a + r.attempts, 0);
   const correct = Object.values(records).reduce((a, r) => a + r.correct, 0);
   const rate = attempts ? Math.round((correct / attempts) * 100) : 0;
   const weak = pool.filter((q) => isWeak(records[q.id]) || bookmarks.includes(q.id));
-  const unverified = allQuestions.filter((q) => !q.verified).length;
+  const unverified = getQuestions().filter((q) => !q.verified).length;
 
   const setSetting = (k: keyof Store["settings"], v: boolean) =>
     setStore({ ...store, settings: { ...settings, [k]: v } });
@@ -28,9 +28,9 @@ export default function Home({ store, setStore, go, startExam, resumeExam }: Pro
   return (
     <div className="space-y-6">
       <section className="grid grid-cols-3 gap-3">
-        <Stat label="解答済み" value={`${answered} / ${allQuestions.length}`} />
+        <Stat label="解答済み" value={`${answered} / ${getQuestions().length}`} />
         <Stat label="正答率" value={`${rate}%`} />
-        <Stat label="苦手問題" value={`${allQuestions.filter((q) => isWeak(records[q.id])).length}問`} />
+        <Stat label="苦手問題" value={`${getQuestions().filter((q) => isWeak(records[q.id])).length}問`} />
       </section>
 
       <section className="space-y-3">
@@ -118,6 +118,14 @@ export default function Home({ store, setStore, go, startExam, resumeExam }: Pro
           })}
         </div>
       </section>
+
+      <button
+        onClick={() => go({ name: "data" })}
+        className="flex w-full items-center gap-2 rounded-lg border border-slate-200 bg-white p-4 text-left text-blue-950 shadow-sm hover:border-blue-400"
+      >
+        <Database size={18} />
+        <span className="font-semibold">問題データの管理（読み込み・書き出し）</span>
+      </button>
 
       <section className="space-y-2 rounded-lg border border-slate-200 bg-white p-4 text-sm">
         <h2 className="font-bold text-blue-950">設定</h2>
