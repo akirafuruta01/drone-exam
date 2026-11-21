@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Clock, Flag } from "lucide-react";
+import { CheckCircle2, Clock, Flag, XCircle } from "lucide-react";
 import { findQuestion } from "../lib/questions";
 import type { ExamState, Store } from "../lib/storage";
 import { categoryName } from "../lib/types";
@@ -33,6 +33,10 @@ export default function Exam({ store, setStore, onFinish }: Props) {
   const q = findQuestion(items[current].id)!;
   const order = items[current].order;
   const unanswered = answers.filter((a) => a === null).length;
+  // すぐ解説を出す設定なら、答えた問題は答えを変えられないようにする
+  const instant = store.settings.examInstantFeedback;
+  const shown = instant && answers[current] !== null;
+  const ok = answers[current] === q.answerIndex;
 
   const finish = () => {
     const msg = unanswered
@@ -75,15 +79,19 @@ export default function Exam({ store, setStore, onFinish }: Props) {
           <div className="space-y-2">
             {order.map((orig, n) => {
               const sel = answers[current] === orig;
+              let style = sel ? "border-blue-600 bg-blue-50" : "border-slate-200 bg-white";
+              if (shown && orig === q.answerIndex) style = "border-green-500 bg-green-50";
+              else if (shown && sel) style = "border-red-500 bg-red-50";
               return (
                 <label
                   key={orig}
-                  className={`flex cursor-pointer gap-3 rounded-lg border-2 bg-white p-4 ${sel ? "border-blue-600 bg-blue-50" : "border-slate-200"}`}
+                  className={`flex gap-3 rounded-lg border-2 p-4 ${shown ? "" : "cursor-pointer"} ${style}`}
                 >
                   <input
                     type="radio"
                     name={`q${current}`}
                     checked={sel}
+                    disabled={shown}
                     onChange={() => update({ answers: answers.map((a, k) => (k === current ? orig : a)) })}
                     className="mt-1"
                   />
@@ -93,6 +101,16 @@ export default function Exam({ store, setStore, onFinish }: Props) {
               );
             })}
           </div>
+
+          {shown && (
+            <div className="space-y-2 rounded-lg bg-white p-4 shadow-sm">
+              <div className={`flex items-center gap-2 font-bold ${ok ? "text-green-600" : "text-red-600"}`}>
+                {ok ? <CheckCircle2 size={20} /> : <XCircle size={20} />} {ok ? "正解" : "不正解"}
+              </div>
+              <p className="text-sm leading-relaxed">{q.explanation}</p>
+              <p className="text-xs text-slate-500">参照：{q.reference}</p>
+            </div>
+          )}
 
           <label className="flex items-center gap-2 text-sm">
             <input
