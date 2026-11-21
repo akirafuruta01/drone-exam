@@ -60,6 +60,16 @@ export function parseQuestions(text: string): ImportResult {
       verifiedAt: (o.verifiedAt as string) ?? null,
       sourceVersion: (o.sourceVersion as string) ?? null,
       ...(o.origin ? { origin: o.origin as Question["origin"] } : {}),
+      ...(Array.isArray(o.choiceNotes) && o.choiceNotes.length === 3 && o.choiceNotes.every((n) => typeof n === "string")
+        ? { choiceNotes: o.choiceNotes as string[] }
+        : {}),
+      ...(Array.isArray(o.terms)
+        ? {
+            terms: (o.terms as Record<string, unknown>[]).filter(
+              (t) => t && isStr(t.term) && isStr(t.meaning),
+            ) as { term: string; meaning: string }[],
+          }
+        : {}),
     });
   });
   return { questions, errors };

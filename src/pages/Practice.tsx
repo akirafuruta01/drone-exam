@@ -4,6 +4,7 @@ import { choiceOrder, shuffle } from "../lib/questions";
 import { recordAnswer, toggleBookmark, type Store } from "../lib/storage";
 import { categoryName, type Question } from "../lib/types";
 import OriginMark from "../lib/OriginMark";
+import { ChoiceNote, TermsMemo } from "../lib/QuestionParts";
 
 interface Props {
   title: string;
@@ -82,6 +83,7 @@ export default function Practice({ title, questions, store, setStore, onExit }: 
           <OriginMark q={q} />
           {q.question}
         </p>
+        <TermsMemo q={q} />
       </div>
 
       <div className="space-y-2">
@@ -97,7 +99,10 @@ export default function Practice({ title, questions, store, setStore, onExit }: 
               className={`flex w-full gap-3 rounded-lg border-2 p-4 text-left ${style}`}
             >
               <span className="font-bold text-blue-900">{n + 1}</span>
-              <span>{q.choices[orig]}</span>
+              <span>
+                {q.choices[orig]}
+                {answered && <ChoiceNote q={q} orig={orig} />}
+              </span>
             </button>
           );
         })}

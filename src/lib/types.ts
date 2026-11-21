@@ -14,6 +14,10 @@ export interface Question {
   sourceVersion: string | null;
   /** 問題の作り方：kyosoku＝教則の文をほぼそのまま使った問題、original＝AIが考えたオリジナル問題 */
   origin?: "kyosoku" | "original";
+  /** 選択肢ごとの解説（元の並び順。正解の選択肢は空文字） */
+  choiceNotes?: string[];
+  /** 問題文の下に出す用語メモ */
+  terms?: { term: string; meaning: string }[];
 }
 
 export const CATEGORIES: { id: CategoryId; name: string; detail: string }[] = [

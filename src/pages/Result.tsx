@@ -3,6 +3,7 @@ import { findQuestion, PASS_RATE } from "../lib/questions";
 import type { ExamState } from "../lib/storage";
 import { CATEGORIES, categoryName } from "../lib/types";
 import OriginMark from "../lib/OriginMark";
+import { ChoiceNote, TermsMemo } from "../lib/QuestionParts";
 
 
 export default function Result({ exam, onExit }: { exam: ExamState; onExit: () => void }) {
@@ -77,6 +78,7 @@ export default function Result({ exam, onExit }: { exam: ExamState; onExit: () =
             </summary>
             <div className="mt-3 space-y-2 text-sm">
               <div className="text-xs text-blue-700">{categoryName(q.category)}</div>
+              <TermsMemo q={q} />
               {order.map((orig, n) => (
                 <div
                   key={orig}
@@ -85,6 +87,7 @@ export default function Result({ exam, onExit }: { exam: ExamState; onExit: () =
                   {n + 1}. {q.choices[orig]}
                   {orig === q.answerIndex && <b className="ml-2 text-green-700">正解</b>}
                   {orig === picked && orig !== q.answerIndex && <b className="ml-2 text-red-700">あなたの回答</b>}
+                  <ChoiceNote q={q} orig={orig} />
                 </div>
               ))}
               {picked === null && <div className="text-red-700">未解答</div>}
