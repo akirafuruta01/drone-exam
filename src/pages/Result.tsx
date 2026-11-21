@@ -1,13 +1,12 @@
 import { CheckCircle2, XCircle } from "lucide-react";
-import { allQuestions, PASS_RATE } from "../lib/questions";
+import { findQuestion, PASS_RATE } from "../lib/questions";
 import type { ExamState } from "../lib/storage";
 import { CATEGORIES, categoryName } from "../lib/types";
 
-const byId = new Map(allQuestions.map((q) => [q.id, q]));
 
 export default function Result({ exam, onExit }: { exam: ExamState; onExit: () => void }) {
   const rows = exam.items.map((it, k) => {
-    const q = byId.get(it.id)!;
+    const q = findQuestion(it.id)!;
     return { q, order: it.order, picked: exam.answers[k], ok: exam.answers[k] === q.answerIndex };
   });
   const score = rows.filter((r) => r.ok).length;

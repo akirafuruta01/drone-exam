@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Clock, Flag } from "lucide-react";
-import { allQuestions } from "../lib/questions";
+import { findQuestion } from "../lib/questions";
 import type { ExamState, Store } from "../lib/storage";
 import { categoryName } from "../lib/types";
 
@@ -10,7 +10,6 @@ interface Props {
   onFinish: (exam: ExamState) => void;
 }
 
-const byId = new Map(allQuestions.map((q) => [q.id, q]));
 
 export default function Exam({ store, setStore, onFinish }: Props) {
   const exam = store.exam!;
@@ -30,7 +29,7 @@ export default function Exam({ store, setStore, onFinish }: Props) {
 
   const update = (patch: Partial<ExamState>) => setStore({ ...store, exam: { ...exam, ...patch } });
   const { items, answers, flags, current } = exam;
-  const q = byId.get(items[current].id)!;
+  const q = findQuestion(items[current].id)!;
   const order = items[current].order;
   const unanswered = answers.filter((a) => a === null).length;
 
