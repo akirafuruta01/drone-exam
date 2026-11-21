@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, type Dispatch, type SetStateAction } from "react";
 import { CheckCircle2, Clock, Flag, XCircle } from "lucide-react";
 import { findQuestion } from "../lib/questions";
 import type { ExamState, Store } from "../lib/storage";
@@ -9,10 +9,12 @@ import AnswerInput, { ANSWER_MODES, hashOf, type AnswerMode } from "../lib/Answe
 import { usePageBackground } from "../lib/background";
 import Podcast from "../lib/Podcast";
 import { useAltFor, worded } from "../lib/wording";
+import { PODCAST_EVENT } from "../lib/Podcast";
+import { randomAnim } from "../lib/anim";
 
 interface Props {
   store: Store;
-  setStore: (s: Store) => void;
+  setStore: Dispatch<SetStateAction<Store>>;
   onFinish: (exam: ExamState) => void;
 }
 
@@ -20,7 +22,24 @@ interface Props {
 export default function Exam({ store, setStore, onFinish }: Props) {
   const exam = store.exam!;
   const [now, setNow] = useState(Date.now());
-  const left = Math.max(0, Math.ceil((exam.endsAt - now) / 1000));
+  const paused = !!exam.pausedAt;
+  const left = Math.max(0, Math.ceil((exam.endsAt - (exam.pausedAt ?? now)) / 1000));
+
+  // ポッドキャストを再生している間は、残り時間を止める
+  useEffect(() => {
+    const pause = () =>
+      setStore((s) => (s.exam && !s.exam.pausedAt ? { ...s, exam: { ...s.exam, pausedAt: Date.now() } } : s));
+    const resume = () =>
+      setStore((s) =>
+        s.exam?.pausedAt
+          ? { ...s, exam: { ...s.exam, endsAt: s.exam.endsAt + (Date.now() - s.exam.pausedAt), pausedAt: null } }
+          : s,
+      );
+    const onPodcast = (e: Event) => ((e as CustomEvent<boolean>).detail ? pause() : resume());
+    resume(); // アプリを閉じる前に止めたままだった場合は、ここから再開する
+    window.addEventListener(PODCAST_EVENT, onPodcast);
+    return () => window.removeEventListener(PODCAST_EVENT, onPodcast);
+  }, [setStore]);
 
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
@@ -29,7 +48,7 @@ export default function Exam({ store, setStore, onFinish }: Props) {
 
   // 時間切れで自動採点
   useEffect(() => {
-    if (left === 0) onFinish(exam);
+    if (left === 0 && !paused) onFinish(exam);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [left]);
 
@@ -47,6 +66,12 @@ export default function Exam({ store, setStore, onFinish }: Props) {
   const seed = hashOf(`${q.id}-${current}`);
   usePageBackground(seed);
   const mode: AnswerMode = store.settings.varyAnswerMode ? ANSWER_MODES[seed % ANSWER_MODES.length] : "tap";
+  // 問題が変わったら、ページの上から表示し、毎回ちがうアニメーションで出す
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [exam.current]);
+  const anim = useMemo(() => randomAnim(), [exam.current]);
+
   const choose = (orig: number) => update({ answers: answers.map((a, k) => (k === current ? orig : a)) });
 
   const finish = () => {
@@ -64,6 +89,7 @@ export default function Exam({ store, setStore, onFinish }: Props) {
       <div className="sticky top-0 z-10 -mx-4 flex items-center justify-between bg-white/80 px-4 py-2 backdrop-blur">
         <span className={`flex items-center gap-1 text-lg font-bold ${left < 300 ? "text-red-600" : "text-blue-950"}`}>
           <Clock size={20} /> 残り {mm}:{ss}
+          {paused && <span className="ml-1 rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-800">⏸ 再生中は停止</span>}
         </span>
         <button onClick={finish} className="rounded-lg bg-blue-900 px-4 py-2 text-sm font-bold text-white">
           採点する
@@ -71,7 +97,7 @@ export default function Exam({ store, setStore, onFinish }: Props) {
       </div>
 
       <div className="gap-6 md:flex">
-        <div className="flex-1 space-y-4">
+        <div key={current} className={`flex-1 space-y-4 ${anim}`}>
           <div className="rounded-lg bg-white p-5 shadow-sm">
             <div className="mb-2 flex items-center justify-between text-xs">
               <span className="text-blue-700">

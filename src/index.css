@@ -36,3 +36,24 @@
   .drone-timer { animation: none; }
   .drone-rotor, .drone-watch { animation: none; }
 }
+
+/* 問題が切り替わるときのアニメーション（毎回ランダムで1つ選ぶ） */
+.q-anim-up { animation: q-up 0.45s ease-out; }
+.q-anim-left { animation: q-left 0.45s ease-out; }
+.q-anim-right { animation: q-right 0.45s ease-out; }
+.q-anim-zoom { animation: q-zoom 0.45s ease-out; }
+.q-anim-flip { animation: q-flip 0.55s ease-out; transform-origin: top center; }
+.q-anim-blur { animation: q-blur 0.5s ease-out; }
+.q-anim-drop { animation: q-drop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.q-anim-tilt { animation: q-tilt 0.5s ease-out; }
+@keyframes q-up { from { opacity: 0; transform: translateY(28px); } }
+@keyframes q-left { from { opacity: 0; transform: translateX(48px); } }
+@keyframes q-right { from { opacity: 0; transform: translateX(-48px); } }
+@keyframes q-zoom { from { opacity: 0; transform: scale(0.9); } }
+@keyframes q-flip { from { opacity: 0; transform: perspective(800px) rotateX(-28deg); } }
+@keyframes q-blur { from { opacity: 0; filter: blur(10px); } }
+@keyframes q-drop { from { opacity: 0; transform: translateY(-36px); } }
+@keyframes q-tilt { from { opacity: 0; transform: rotate(-3deg) translateY(18px); } }
+@media (prefers-reduced-motion: reduce) {
+  [class*="q-anim-"] { animation: none; }
+}
