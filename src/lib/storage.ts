@@ -33,6 +33,8 @@ export interface ExamState {
   flags: boolean[];
   current: number;
   endsAt: number;
+  /** ポッドキャスト再生中で時間を止めている場合、止めた時刻 */
+  pausedAt?: number | null;
 }
 
 export interface Store {

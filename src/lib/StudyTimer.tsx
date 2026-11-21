@@ -34,14 +34,20 @@ export function formatTime(total: number) {
 export default function StudyTimer({ active }: { active: boolean }) {
   const seconds = useRef(loadSeconds());
   const lastInput = useRef(Date.now());
+  const listening = useRef(false);
   const [shown, setShown] = useState<number | null>(null);
   const hideTimer = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const mark = () => (lastInput.current = Date.now());
+    const onPodcast = (e: Event) => (listening.current = (e as CustomEvent<boolean>).detail);
+    window.addEventListener("podcast-playing", onPodcast);
     const events = ["pointerdown", "keydown", "touchstart", "scroll"] as const;
     events.forEach((e) => window.addEventListener(e, mark, { passive: true }));
-    return () => events.forEach((e) => window.removeEventListener(e, mark));
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, mark));
+      window.removeEventListener("podcast-playing", onPodcast);
+    };
   }, []);
 
   useEffect(() => {
@@ -49,7 +55,8 @@ export default function StudyTimer({ active }: { active: boolean }) {
     lastInput.current = Date.now();
     const t = window.setInterval(() => {
       if (document.visibilityState !== "visible") return;
-      if (Date.now() - lastInput.current > IDLE_LIMIT) return;
+      // ポッドキャストを聞いている間は、操作がなくても学習中として数える
+      if (!listening.current && Date.now() - lastInput.current > IDLE_LIMIT) return;
       seconds.current += 1;
       if (seconds.current % 5 === 0) saveSeconds(seconds.current);
       if (seconds.current % 60 === 0) {

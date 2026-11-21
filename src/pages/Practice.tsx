@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Star, XCircle } from "lucide-react";
 import { choiceOrder, shuffle } from "../lib/questions";
 import { recordAnswer, toggleBookmark, type Store } from "../lib/storage";
@@ -9,6 +9,7 @@ import AnswerInput, { ANSWER_MODES, type AnswerMode } from "../lib/AnswerInput";
 import { BACKGROUNDS, usePageBackground } from "../lib/background";
 import Podcast from "../lib/Podcast";
 import { worded } from "../lib/wording";
+import { randomAnim } from "../lib/anim";
 
 interface Props {
   title: string;
@@ -37,6 +38,11 @@ export default function Practice({ title, questions, store, setStore, onExit }: 
   const [picked, setPicked] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   usePageBackground(i < items.length ? items[i].bg : null);
+  // 次の問題に進んだら、ページの上から表示し、毎回ちがうアニメーションで出す
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [i]);
+  const anim = useMemo(() => randomAnim(), [i]);
 
   if (i >= items.length) {
     return (
@@ -76,6 +82,7 @@ export default function Practice({ title, questions, store, setStore, onExit }: 
         </button>
       </div>
 
+      <div key={i} className={`space-y-4 ${anim}`}>
       <div className="rounded-lg bg-white p-5 shadow-sm">
         <div className="mb-2 flex items-center justify-between gap-2 text-xs">
           <span className="text-blue-700">{categoryName(q.category)}</span>
@@ -142,6 +149,7 @@ export default function Practice({ title, questions, store, setStore, onExit }: 
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 }
