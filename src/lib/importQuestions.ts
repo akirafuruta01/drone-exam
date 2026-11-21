@@ -63,6 +63,14 @@ export function parseQuestions(text: string): ImportResult {
       ...(Array.isArray(o.choiceNotes) && o.choiceNotes.length === 3 && o.choiceNotes.every((n) => typeof n === "string")
         ? { choiceNotes: o.choiceNotes as string[] }
         : {}),
+      ...(o.alt &&
+      typeof o.alt === "object" &&
+      isStr((o.alt as Record<string, unknown>).question) &&
+      Array.isArray((o.alt as Record<string, unknown>).choices) &&
+      ((o.alt as Record<string, unknown>).choices as unknown[]).length === 3 &&
+      ((o.alt as Record<string, unknown>).choices as unknown[]).every(isStr)
+        ? { alt: o.alt as Question["alt"] }
+        : {}),
       ...(Array.isArray(o.terms)
         ? {
             terms: (o.terms as Record<string, unknown>[]).filter(

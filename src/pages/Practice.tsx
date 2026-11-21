@@ -8,6 +8,7 @@ import { ChoiceNote, TermsMemo } from "../lib/QuestionParts";
 import AnswerInput, { ANSWER_MODES, type AnswerMode } from "../lib/AnswerInput";
 import { BACKGROUNDS, usePageBackground } from "../lib/background";
 import Podcast from "../lib/Podcast";
+import { worded } from "../lib/wording";
 
 interface Props {
   title: string;
@@ -22,7 +23,7 @@ export default function Practice({ title, questions, store, setStore, onExit }: 
   const items = useMemo(
     () =>
       shuffle(questions).map((q) => ({
-        q,
+        q: worded(q, Math.random() < 0.5),
         order: choiceOrder(store.settings.shuffleChoices),
         mode: store.settings.varyAnswerMode
           ? ANSWER_MODES[Math.floor(Math.random() * ANSWER_MODES.length)]
