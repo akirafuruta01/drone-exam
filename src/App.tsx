@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getQuestions, findQuestion, choiceOrder, setCustomQuestions, examSpec, pickExam, type ExamType } from "./lib/questions";
 import { load, recordAnswer, save, type ExamState, type Store } from "./lib/storage";
 import type { Question } from "./lib/types";
+import Challenge from "./pages/Challenge";
 import DataManager from "./pages/DataManager";
 import StudyTimer from "./lib/StudyTimer";
 import Exam from "./pages/Exam";
@@ -14,7 +15,8 @@ export type View =
   | { name: "practice"; title: string; questions: Question[] }
   | { name: "exam" }
   | { name: "result"; exam: ExamState }
-  | { name: "data" };
+  | { name: "data" }
+  | { name: "challenge" };
 
 
 export default function App() {
@@ -59,7 +61,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-slate-800">
-      <StudyTimer active={view.name === "practice" || view.name === "exam" || view.name === "result"} />
+      <StudyTimer active={view.name === "practice" || view.name === "exam" || view.name === "result" || view.name === "challenge"} />
       <header className="bg-blue-950 text-white">
         <div className="mx-auto max-w-4xl px-4 py-3">
           <button
@@ -96,6 +98,7 @@ export default function App() {
         {view.name === "exam" && store.exam && (
           <Exam store={store} setStore={setStore} onFinish={finishExam} />
         )}
+        {view.name === "challenge" && <Challenge onExit={() => setView({ name: "home" })} />}
         {view.name === "data" && (
           <DataManager store={store} setStore={setStore} onExit={() => setView({ name: "home" })} />
         )}
