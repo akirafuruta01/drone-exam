@@ -1,4 +1,4 @@
-import { BookOpen, Clock, Database, Target, TriangleAlert } from "lucide-react";
+import { BookOpen, Clock, Database, PenLine, Target, TriangleAlert } from "lucide-react";
 import type { View } from "../App";
 import { getQuestions, examSpec, PASS_RATE, SESSION_SIZES } from "../lib/questions";
 import { isWeak, type Store } from "../lib/storage";
@@ -82,6 +82,12 @@ export default function Home({ store, setStore, go, startExam, resumeExam }: Pro
             />
           );
         })}
+        <ModeButton
+          icon={<PenLine size={22} />}
+          title="書く・穴埋めチャレンジ（10問）"
+          note="書いて答える5問＋穴埋め5問をランダムに出題"
+          onClick={() => go({ name: "challenge" })}
+        />
         <ModeButton
           icon={<Target size={22} />}
           title="弱点克服"
