@@ -1,5 +1,6 @@
-import { BookOpen, Clock, Database, PenLine, Target, TriangleAlert } from "lucide-react";
+import { BookOpen, Clock, Database, Headphones, PenLine, Target, TriangleAlert } from "lucide-react";
 import type { View } from "../App";
+import podcasts from "../data/podcasts.json";
 import { getQuestions, examSpec, PASS_RATE, SESSION_SIZES } from "../lib/questions";
 import { isWeak, type Store } from "../lib/storage";
 import { CATEGORIES } from "../lib/types";
@@ -143,6 +144,14 @@ export default function Home({ store, setStore, go, startExam, resumeExam }: Pro
           })}
         </div>
       </section>
+
+      <button
+        onClick={() => go({ name: "podcasts" })}
+        className="flex w-full items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 p-4 text-left text-blue-950 shadow-sm hover:border-blue-400"
+      >
+        <Headphones size={18} />
+        <span className="font-semibold">ポッドキャスト集（{Object.keys(podcasts).length}話）</span>
+      </button>
 
       <button
         onClick={() => go({ name: "data" })}

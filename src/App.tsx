@@ -3,6 +3,7 @@ import { getQuestions, findQuestion, choiceOrder, setCustomQuestions, examSpec, 
 import { load, recordAnswer, save, type ExamState, type Store } from "./lib/storage";
 import type { Question } from "./lib/types";
 import Challenge from "./pages/Challenge";
+import PodcastLibrary from "./pages/PodcastLibrary";
 import DataManager from "./pages/DataManager";
 import StudyTimer from "./lib/StudyTimer";
 import Exam from "./pages/Exam";
@@ -16,7 +17,8 @@ export type View =
   | { name: "exam" }
   | { name: "result"; exam: ExamState }
   | { name: "data" }
-  | { name: "challenge" };
+  | { name: "challenge" }
+  | { name: "podcasts" };
 
 
 export default function App() {
@@ -61,7 +63,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-slate-800">
-      <StudyTimer active={view.name === "practice" || view.name === "exam" || view.name === "result" || view.name === "challenge"} />
+      <StudyTimer active={view.name === "practice" || view.name === "exam" || view.name === "result" || view.name === "challenge" || view.name === "podcasts"} />
       <header className="bg-blue-950 text-white">
         <div className="mx-auto max-w-4xl px-4 py-3">
           <button
@@ -98,6 +100,7 @@ export default function App() {
         {view.name === "exam" && store.exam && (
           <Exam store={store} setStore={setStore} onFinish={finishExam} />
         )}
+        {view.name === "podcasts" && <PodcastLibrary onExit={() => setView({ name: "home" })} />}
         {view.name === "challenge" && <Challenge onExit={() => setView({ name: "home" })} />}
         {view.name === "data" && (
           <DataManager store={store} setStore={setStore} onExit={() => setView({ name: "home" })} />
